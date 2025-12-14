@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import logo from "../../assets/images/LOGO 1.png";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Home from "../Home/Home";
 import About from "../About/About";
+import { UserContext } from "../../Context/UserContext";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  let { userLogin, setuserLogin } = useContext(UserContext);
+   let navigate = useNavigate();
+   function logOut() {
+     localStorage.removeItem("userToken");
+     setuserLogin(null);
+     navigate("/login");
+   }
   return (
     <>
       <nav className="bg-white shadow-lg m-0 p-4">
@@ -22,11 +30,11 @@ export default function Navbar() {
               className="md:hidden text-2xl"
               onClick={() => setOpen(!open)}
             >
-              <i class="fa-solid fa-bars"></i>
+              <i className="fa-solid fa-bars"></i>
             </button>
           </div>
           <ul
-            className={`md:flex md:flex-row mt-2 flex-col gap-4 ${
+            className={`md:flex md:flex-row flex-col gap-4 ${
               open ? "flex" : "hidden"
             } items-center`}
           >
@@ -36,9 +44,11 @@ export default function Navbar() {
             <li className="nav-links">
               <NavLink to={"/about"}>About</NavLink>
             </li>
-            <li className="nav-links">
-              <NavLink to={"/cart"}>Cart</NavLink>
-            </li>
+            {userLogin !== null ? (
+              <li className="nav-links">
+                <NavLink to={"/cart"}>Cart</NavLink>
+              </li>
+            ) : null}
             <li className="nav-links">
               <NavLink to={"/brands"}>Brands</NavLink>
             </li>
@@ -50,19 +60,24 @@ export default function Navbar() {
             </li>
           </ul>
           <ul
-            className={`md:flex md:flex-row flex-col items-center ${
+            className={`md:flex md:flex-row flex-col mt-4 md:mt-0 items-center ${
               open ? "flex" : "hidden"
             } gap-4 `}
           >
-            <li className="nav-links">
-              <NavLink to={"/login"}>Login</NavLink>
-            </li>
-            <li className="nav-links">
-              <NavLink to={"/register"}>Register</NavLink>
-            </li>
-            <li className="nav-links">
-              <NavLink to={"/logout"}>Logout</NavLink>
-            </li>
+            {userLogin === null ? (
+              <>
+                <li className="nav-links">
+                  <NavLink to={"/register"}>Register</NavLink>
+                </li>
+                <li className="nav-links">
+                  <NavLink to={"/login"}>Login</NavLink>
+                </li>
+              </>
+            ) : (
+              <li onClick={logOut} className="nav-links cursor-pointer">
+                <span>Logout</span>
+              </li>
+            )}
           </ul>
         </div>
       </nav>
